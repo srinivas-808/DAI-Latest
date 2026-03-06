@@ -283,7 +283,7 @@ const LandingPage = ({ onStart }) => {
           <div className="lp-fc lp-reveal">
             <div className="lp-fc-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" stroke="currentColor" strokeWidth="1.8"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg></div>
             <div className="lp-fc-title">Text-to-Speech Responses</div>
-            <div className="lp-fc-desc">Listen to any AI response read aloud using local Piper TTS or Sarvam AI. Switch between voice models like Ryan and Lessac from the message menu.</div>
+            <div className="lp-fc-desc">Listen to any AI response read aloud using Sarvam AI. High quality multi-lingual voices are used automatically.</div>
           </div>
           <div className="lp-fc lp-reveal lp-d1">
             <div className="lp-fc-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.8"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20" stroke="currentColor" strokeWidth="1.8"/></svg></div>

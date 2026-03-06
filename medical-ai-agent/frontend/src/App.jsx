@@ -261,7 +261,6 @@ const AppContent = () => {
   const [isBotLoading, setIsBotLoading] = useState(false);
   const [needsApiKey, setNeedsApiKey] = useState(false);
   const [isCheckingKey, setIsCheckingKey] = useState(false);
-  const [selectedVoice, setSelectedVoice] = useState('ryan');
   const [isConnected, setIsConnected] = useState(true);
   const [isMaximized, setIsMaximized] = useState(false);
 
@@ -507,35 +506,7 @@ const AppContent = () => {
             </div>
             <div className="flex items-center gap-3">
               <ConnectionStatus isConnected={isConnected} onRetry={checkConnection} />
-              <div className="hidden sm:flex bg-slate-100 rounded-full p-1 border border-slate-200 shadow-inner" id="voice-selector">
-                <button
-                  id="voice-ryan-btn"
-                  onClick={() => { setSelectedVoice('ryan'); toast('Voice set to Ryan', 'info', 1500); }}
-                  className={`px-4 py-1.5 text-xs font-bold rounded-full transition-all ${selectedVoice === 'ryan' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
-                >
-                  Voice: Ryan
-                </button>
-                <button
-                  id="voice-lessac-btn"
-                  onClick={() => { setSelectedVoice('lessac'); toast('Voice set to Lessac', 'info', 1500); }}
-                  className={`px-4 py-1.5 text-xs font-bold rounded-full transition-all ${selectedVoice === 'lessac' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
-                >
-                  Voice: Lessac
-                </button>
-              </div>
-              {/* Mobile voice toggle */}
-              <button
-                id="voice-toggle-mobile"
-                onClick={() => {
-                  const next = selectedVoice === 'ryan' ? 'lessac' : 'ryan';
-                  setSelectedVoice(next);
-                  toast(`Voice: ${next.charAt(0).toUpperCase() + next.slice(1)}`, 'info', 1500);
-                }}
-                className="sm:hidden px-3 py-1.5 text-xs font-bold rounded-full bg-slate-100 border border-slate-200 text-slate-600"
-              >
-                🔊 {selectedVoice.charAt(0).toUpperCase() + selectedVoice.slice(1)}
-              </button>
-              <button id="exit-portal-btn" onClick={() => setShowLanding(true)} className="text-slate-500 hover:text-rose-600 text-sm font-medium transition-colors">Exit Portal</button>
+                <button id="exit-portal-btn" onClick={() => setShowLanding(true)} className="text-slate-500 hover:text-rose-600 text-sm font-medium transition-colors">Exit Portal</button>
             </div>
           </div>
           <nav id="main-nav">
@@ -574,7 +545,7 @@ const AppContent = () => {
             </button>
           </div>
 
-          {activeTab === 'chat' && <ChatAgent messages={messages} onSendMessage={processChatMessage} isLoading={isBotLoading} selectedVoice={selectedVoice} />}
+          {activeTab === 'chat' && <ChatAgent messages={messages} onSendMessage={processChatMessage} isLoading={isBotLoading} />}
           {activeTab === 'prediction' && (
             <PredictionComponent
               sessionId={sessionIdRef.current}
@@ -840,7 +811,7 @@ const DiagnosisComponent = ({
 
 /* ================= CHAT AGENT ================= */
 
-const ChatAgent = ({ messages, onSendMessage, isLoading, selectedVoice }) => {
+const ChatAgent = ({ messages, onSendMessage, isLoading }) => {
   const [input, setInput] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -926,7 +897,6 @@ const ChatAgent = ({ messages, onSendMessage, isLoading, selectedVoice }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text: cleanText,
-          voice: selectedVoice,
           language: lang
         })
       }, 300000); // 5 minute timeout for TTS

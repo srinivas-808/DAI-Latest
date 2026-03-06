@@ -233,7 +233,6 @@ async def chat_stream(
 # -------------------------------
 class TTSRequest(BaseModel):
     text: str
-    voice: str = "ryan"
     language: str = "en"
 
 
@@ -285,123 +284,53 @@ async def generate_tts(req: TTSRequest):
     max_tts_chars = 5000
     text_to_speak = req.text.strip()[:max_tts_chars]
     
-    # Validate voice and language selection
-    allowed_voices = {"ryan", "lessac", "priyamvada", "maya"}
-    voice = req.voice.lower() if req.voice else None
+    # Validate language selection
     language = req.language.lower() if req.language else "en"
 
-    # Auto-select voice based on language if voice not explicitly provided or invalid for language
-    if language == "hi":
-        voice = "priyamvada"
-    elif language == "te":
-        voice = "maya"
-    elif not voice or voice not in {"ryan", "lessac"}:
-        voice = "ryan"
-
-    piper_dir = os.path.join(BASE_DIR, "app", "piper")
-    piper_exe = os.path.join(piper_dir, "piper.exe")
-    
-    # Check if Piper is available
-    if not os.path.exists(piper_exe):
+    # Try Sarvam AI first if API key is present
+    sarvam_key = os.getenv("SARVAM_API_KEY")
+    if not sarvam_key:
         return JSONResponse(
             status_code=503,
             content={
-                "error": "Text-to-speech engine is not available. Please ensure Piper TTS is installed.",
+                "error": "Sarvam API Key is not configured. Text-to-Speech is unavailable.",
                 "code": "TTS_UNAVAILABLE"
             }
         )
-    
-    if voice == "lessac":
-        model_filename = "en_US-lessac-high.onnx"
-    elif voice == "priyamvada" or (language == "hi" and voice == "priyamvada"):
-        model_filename = "hi_IN-priyamvada-medium.onnx"
-    elif voice == "maya" or (language == "te" and voice == "maya"):
-        model_filename = "te_IN-maya-medium.onnx"
-    else:
-        model_filename = "en_US-ryan-medium.onnx"
-    
-    model_path = os.path.join(piper_dir, model_filename)
-    if not os.path.exists(model_path):
-        return JSONResponse(
-            status_code=503,
-            content={
-                "error": f"Voice model '{voice}' is not installed.",
-                "code": "VOICE_UNAVAILABLE"
-            }
-        )
-        
-    temp_filename = f"piper_{uuid.uuid4().hex}.wav"
-    temp_wav = os.path.join(piper_dir, temp_filename)
-        
+
     try:
-        process = subprocess.Popen(
-            [piper_exe, "--model", model_filename, "--output_file", temp_filename],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            cwd=piper_dir
-        )
-        _, err = process.communicate(
-            input=text_to_speak.encode('utf-8'),
-            timeout=300  # 5 minutes timeout for longer text
-        )
+        from sarvamai import SarvamAI
+        import base64
+        client = SarvamAI(api_subscription_key=sarvam_key)
         
-        if process.returncode != 0:
-            error_msg = err.decode('utf-8', errors='ignore')
-            print(f"Piper error: {error_msg}")
-            return JSONResponse(
-                status_code=500,
-                content={
-                    "error": "Speech synthesis failed. Please try again.",
-                    "code": "TTS_SYNTHESIS_FAILED"
-                }
-            )
-        
-        if not os.path.exists(temp_wav):
-            return JSONResponse(
-                status_code=500,
-                content={
-                    "error": "Speech synthesis completed but no audio was generated.",
-                    "code": "TTS_NO_OUTPUT"
-                }
-            )
+        target_lang = "en-IN"
+        if language == "hi":
+            target_lang = "hi-IN"
+        elif language == "te":
+            target_lang = "te-IN"
             
-        with open(temp_wav, "rb") as f:
-            audio_data = f.read()
+        response = client.text_to_speech.convert(
+            text=text_to_speak,
+            target_language_code=target_lang
+        )
         
-        if len(audio_data) == 0:
+        if hasattr(response, 'audios') and response.audios:
+            audio_bytes = base64.b64decode(response.audios[0])
+            return Response(content=audio_bytes, media_type="audio/wav")
+        else:
             return JSONResponse(
                 status_code=500,
                 content={
-                    "error": "Generated audio file is empty.",
+                    "error": "Target language TTS audio engine returned an empty chunk.",
                     "code": "TTS_EMPTY_OUTPUT"
                 }
             )
-            
-        return Response(content=audio_data, media_type="audio/wav")
-    
-    except subprocess.TimeoutExpired:
-        process.kill()
-        print("Piper TTS timed out")
-        return JSONResponse(
-            status_code=504,
-            content={
-                "error": "Speech synthesis timed out. The text may be too long.",
-                "code": "TTS_TIMEOUT"
-            }
-        )
     except Exception as e:
-        print(f"TTS exception: {traceback.format_exc()}")
+        print(f"Sarvam AI TTS failed: {e}")
         return JSONResponse(
             status_code=500,
             content={
-                "error": "An unexpected error occurred during speech synthesis.",
+                "error": "An error occurred during speech synthesis.",
                 "code": "TTS_ERROR"
             }
         )
-    finally:
-        if os.path.exists(temp_wav):
-            try:
-                os.remove(temp_wav)
-            except Exception:
-                pass
