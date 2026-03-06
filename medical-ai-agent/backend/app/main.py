@@ -12,7 +12,7 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from app.api.chat_api import router as chat_router
 from pydantic import BaseModel
 from google import genai
@@ -134,13 +134,10 @@ def set_api_key(request: ApiKeyRequest):
     return {"status": "success", "message": "API Key validated and saved successfully."}
 
 @app.get("/")
+@app.head("/")
 def health_check():
     """Backend health check endpoint."""
-    return {
-        "status": "healthy",
-        "service": "Diagnos AI Backend",
-        "version": "2.0"
-    }
+    return Response(content="OK", status_code=200, media_type="text/plain")
 
 @app.get("/api/health")
 def api_health():
