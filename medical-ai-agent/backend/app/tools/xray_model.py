@@ -40,8 +40,13 @@ def build_xray_model():
     model.load_weights(WEIGHTS_PATH)
     return model
 
-# 🔥 Load model ONCE
-XRAY_MODEL = build_xray_model()
+_xray_model = None
+
+def _get_xray():
+    global _xray_model
+    if _xray_model is None:
+        _xray_model = build_xray_model()
+    return _xray_model
 
 # ----------- PREDICTION FUNCTION ----------
 def predict_xray(file_path: str, threshold: float = 0.3):
@@ -56,7 +61,8 @@ def predict_xray(file_path: str, threshold: float = 0.3):
     x /= (np.std(x) + 1e-7)
     x = np.expand_dims(x, axis=0)
 
-    preds = XRAY_MODEL.predict(x)[0]
+    model = _get_xray()
+    preds = model.predict(x)[0]
 
     results = []
     for label, score in zip(LABELS, preds):

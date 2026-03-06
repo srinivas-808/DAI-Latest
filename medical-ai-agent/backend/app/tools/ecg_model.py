@@ -48,8 +48,13 @@ def build_ecg_model():
     model.load_weights(WEIGHTS_PATH)
     return model
 
-# Load once at startup
-ECG_MODEL = build_ecg_model()
+_ecg_model = None
+
+def _get_ecg():
+    global _ecg_model
+    if _ecg_model is None:
+        _ecg_model = build_ecg_model()
+    return _ecg_model
 
 # ----------- PREDICTION FUNCTION --------
 def predict_ecg(file_path: str):
@@ -57,7 +62,8 @@ def predict_ecg(file_path: str):
     img_array = image.img_to_array(img)
     img_array = np.expand_dims(img_array, axis=0)
 
-    preds = ECG_MODEL.predict(img_array)[0]
+    model = _get_ecg()
+    preds = model.predict(img_array)[0]
 
     results = []
     for label, score in zip(CLASS_NAMES, preds):

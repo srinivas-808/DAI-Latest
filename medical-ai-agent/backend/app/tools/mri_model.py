@@ -41,8 +41,13 @@ def build_mri_model():
     model.load_weights(MODEL_PATH)
     return model
 
-# 🔥 Load once at startup
-MRI_MODEL = build_mri_model()
+_mri_model = None
+
+def _get_mri():
+    global _mri_model
+    if _mri_model is None:
+        _mri_model = build_mri_model()
+    return _mri_model
 
 # ----------- PREDICTION FUNCTION --------
 def predict_mri(file_path: str):
@@ -52,7 +57,8 @@ def predict_mri(file_path: str):
     img_array = np.asarray(img).astype("float32") / 255.0
     img_array = np.expand_dims(img_array, axis=0)
 
-    preds = MRI_MODEL.predict(img_array)[0]
+    model = _get_mri()
+    preds = model.predict(img_array)[0]
 
     results = []
     for label, score in zip(CLASS_LABELS, preds):
