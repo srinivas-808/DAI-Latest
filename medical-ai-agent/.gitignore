@@ -1,0 +1,15 @@
+# Environment variables
+backend/venv/
+backend/venvw/
+__pycache__/
+*.pyc
+
+overview.txt
+diagnos-ai-landing .html
+
+# Node
+frontend/node_modules/
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,350 @@
+/* ===================================
+   DIAGNOS AI — Global Styles
+   =================================== */
+
+/* Reset root scope issue from Vite boilerplate */
+#root {
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+/* ===================================
+   Typography
+   =================================== */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===================================
+   Custom Scrollbar
+   =================================== */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 99px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Hide scrollbar for symptom chips horizontal scroll */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ===================================
+   Typing Indicator Animation
+   =================================== */
+@keyframes typingDot {
+  0%, 60%, 100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-4px);
+  }
+}
+
+.typing-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #3b82f6;
+  margin: 0 2px;
+}
+
+.typing-dot:nth-child(1) { animation: typingDot 1.4s infinite ease-in-out; }
+.typing-dot:nth-child(2) { animation: typingDot 1.4s infinite ease-in-out 0.2s; }
+.typing-dot:nth-child(3) { animation: typingDot 1.4s infinite ease-in-out 0.4s; }
+
+/* ===================================
+   Confidence Bar Animation
+   =================================== */
+@keyframes growWidth {
+  from { width: 0; }
+}
+
+.confidence-bar {
+  animation: growWidth 0.8s ease-out forwards;
+}
+
+/* ===================================
+   Pulse Glow (for active voice)
+   =================================== */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(59, 130, 246, 0);
+  }
+}
+
+.pulse-glow {
+  animation: pulseGlow 2s infinite;
+}
+
+/* ===================================
+   Fade In Animation
+   =================================== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+/* ===================================
+   Slide In Animation
+   =================================== */
+@keyframes slideInFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-in {
+  animation: slideInFromBottom 0.3s ease-out;
+}
+
+/* ===================================
+   Toast Notification
+   =================================== */
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes toastOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+}
+
+.toast-enter {
+  animation: toastIn 0.3s ease-out;
+}
+
+.toast-exit {
+  animation: toastOut 0.3s ease-in forwards;
+}
+
+/* ===================================
+   Markdown Rendering in Chat
+   =================================== */
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3 {
+  margin-top: 0.8em;
+  margin-bottom: 0.4em;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.markdown-body h1 { font-size: 1.25rem; }
+.markdown-body h2 { font-size: 1.1rem; }
+.markdown-body h3 { font-size: 1rem; }
+
+.markdown-body p {
+  margin-bottom: 0.5em;
+  line-height: 1.7;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  margin: 0.4em 0;
+  padding-left: 1.5em;
+}
+
+.markdown-body li {
+  margin-bottom: 0.25em;
+  line-height: 1.6;
+}
+
+.markdown-body strong {
+  font-weight: 700;
+}
+
+.markdown-body em {
+  font-style: italic;
+}
+
+.markdown-body blockquote {
+  border-left: 3px solid #93c5fd;
+  padding: 0.4em 0.8em;
+  margin: 0.6em 0;
+  background: rgba(59, 130, 246, 0.05);
+  border-radius: 0 0.5rem 0.5rem 0;
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+.markdown-body code {
+  background: rgba(0, 0, 0, 0.06);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.85em;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+.markdown-body pre {
+  background: #1e293b;
+  color: #e2e8f0;
+  padding: 1em;
+  border-radius: 0.75rem;
+  overflow-x: auto;
+  font-size: 0.85em;
+  margin: 0.5em 0;
+}
+
+.markdown-body pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+.markdown-body hr {
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 1em 0;
+}
+
+/* ===================================
+   Connection Status Indicator
+   =================================== */
+@keyframes statusPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.status-connected {
+  background-color: #22c55e;
+  animation: statusPulse 3s ease-in-out infinite;
+}
+
+.status-disconnected {
+  background-color: #ef4444;
+}
+
+/* ===================================
+   Shimmer Loading Effect
+   =================================== */
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #f1f5f9 0px, #e2e8f0 40px, #f1f5f9 80px);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+}
+/* ===================================
+   Premium Glassmorphism & Liquid UI
+   =================================== */
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.1);
+}
+
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: 2.5rem;
+}
+
+.liquid-gradient {
+  background: linear-gradient(135deg, 
+    rgba(241, 245, 249, 0.95), 
+    rgba(224, 242, 254, 0.95), 
+    rgba(245, 243, 255, 0.95), 
+    rgba(240, 253, 244, 0.95)
+  );
+  background-size: 300% 300%;
+  animation: liquidBg 20s ease infinite;
+}
+
+@keyframes liquidBg {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Enhancing existing animations */
+@keyframes pulse {
+  0%, 100% { opacity: 0.1; transform: scale(1); }
+  50% { opacity: 0.15; transform: scale(1.05); }
+}
+
+.animate-pulse {
+  animation: pulse 8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Chat Bubble Hover Liquid Glass Effect */
+.hover-liquid-glass {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-liquid-glass:hover {
+  backdrop-filter: blur(24px) brightness(1.05);
+  -webkit-backdrop-filter: blur(24px) brightness(1.05);
+  box-shadow: 0 20px 40px -8px rgba(31, 38, 135, 0.2), 0 0 25px rgba(255, 255, 255, 0.7) inset;
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.9);
+}
+
+.hover-liquid-glass-user {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-liquid-glass-user:hover {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 1) 0%, rgba(59, 130, 246, 0.95) 100%);
+  box-shadow: 0 20px 40px -8px rgba(37, 99, 235, 0.4), 0 0 20px rgba(96, 165, 250, 0.5) inset;
+  transform: translateY(-2px);
+}

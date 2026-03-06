@@ -1,0 +1,9 @@
+*.keras filter=lfs diff=lfs merge=lfs -text
+*.h5 filter=lfs diff=lfs merge=lfs -text
+*.hdf5 filter=lfs diff=lfs merge=lfs -text
+# Set default behavior to handle line endings automatically
+* text=auto
+# Specifically ensure shell scripts always use LF (Linux endings)
+*.sh text eol=lf
+# You can also ensure python files stay consistent
+*.py text eol=lf
