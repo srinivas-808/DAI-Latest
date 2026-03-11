@@ -80,7 +80,8 @@ def save_upload(file: UploadFile) -> str:
 async def chat(
     message: str = Form(...),
     session_id: str = Form(...),
-    file: Optional[UploadFile] = File(None)
+    file: Optional[UploadFile] = File(None),
+    agent_mode: str = Form("medical_query")
 ):
     file_path = None
 
@@ -116,7 +117,8 @@ async def chat(
         agent_response = run_agent(
             user_message=message,
             session_id=session_id,
-            file_path=file_path
+            file_path=file_path,
+            agent_mode=agent_mode
         )
 
         return {"response": agent_response}
@@ -146,7 +148,8 @@ async def chat(
 async def chat_stream(
     message: str = Form(...),
     session_id: str = Form(...),
-    file: Optional[UploadFile] = File(None)
+    file: Optional[UploadFile] = File(None),
+    agent_mode: str = Form("medical_query")
 ):
     file_path = None
 
@@ -194,7 +197,8 @@ async def chat_stream(
                 user_message=message,
                 session_id=session_id,
                 file_path=file_path,
-                use_vision_capabilities=True
+                use_vision_capabilities=True,
+                agent_mode=agent_mode
             )
 
             if not full_response:

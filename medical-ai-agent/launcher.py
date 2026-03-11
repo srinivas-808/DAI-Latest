@@ -51,7 +51,7 @@ def start_backend():
     print(f"🔧 Starting backend on port {BACKEND_PORT}...")
     
     if is_windows():
-        venv_python_win = os.path.join(BACKEND_DIR, "venv", "Scripts", "python.exe")
+        venv_python_win = os.path.join(BACKEND_DIR, "venvw", "Scripts", "python.exe")
         venv_python_bin = os.path.join(BACKEND_DIR, "venv", "bin", "python")
         
         if os.path.exists(venv_python_win):

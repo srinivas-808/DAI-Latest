@@ -31,6 +31,12 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(BASE_DIR, "system_prompt.txt"), encoding="utf-8") as f:
     SYSTEM_PROMPT = f.read()
 
+try:
+    with open(os.path.join(BASE_DIR, "doctor_prompt.txt"), encoding="utf-8") as f:
+        DOCTOR_PROMPT = f.read()
+except FileNotFoundError:
+    DOCTOR_PROMPT = SYSTEM_PROMPT
+
 with open(os.path.join(BASE_DIR, "developer_prompt.txt"), encoding="utf-8") as f:
     DEVELOPER_PROMPT = f.read()
 
@@ -103,13 +109,15 @@ def build_prompt(
     conversation_context: str,
     symptoms: list[str],
     symptom_result: list[dict] | None,
-    prediction_result: dict | None
+    prediction_result: dict | None,
+    agent_mode: str = "medical_query"
 ) -> str:
     """
     Build a clean, structured prompt with conditional sections.
     Only includes sections that have meaningful data — no raw Python objects.
     """
-    sections = [SYSTEM_PROMPT, "", DEVELOPER_PROMPT, ""]
+    active_prompt = DOCTOR_PROMPT if agent_mode == "doctor" else SYSTEM_PROMPT
+    sections = [active_prompt, "", DEVELOPER_PROMPT, ""]
     
     # Conversation context
     sections.append("## Conversation History")
@@ -177,7 +185,8 @@ def run_agent(
     user_message: str,
     session_id: str,
     file_path: str | None = None,
-    use_vision_capabilities: bool = False
+    use_vision_capabilities: bool = False,
+    agent_mode: str = "medical_query"
 ) -> str:
     """
     Core AI agent with:
@@ -293,7 +302,8 @@ def run_agent(
         conversation_context=conversation_context,
         symptoms=symptoms,
         symptom_result=symptom_result,
-        prediction_result=prediction_result
+        prediction_result=prediction_result,
+        agent_mode=agent_mode
     )
 
     # ----------------------------

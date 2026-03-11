@@ -260,6 +260,7 @@ const AppContent = () => {
   ]);
   const [isBotLoading, setIsBotLoading] = useState(false);
   const [needsApiKey, setNeedsApiKey] = useState(false);
+  const [agentMode, setAgentMode] = useState('medical_query');
   const [isCheckingKey, setIsCheckingKey] = useState(false);
   const [isConnected, setIsConnected] = useState(true);
   const [isMaximized, setIsMaximized] = useState(false);
@@ -385,6 +386,7 @@ const AppContent = () => {
       if (file) {
         formData.append("file", file);
       }
+      formData.append("agent_mode", agentMode);
 
       const res = await fetchWithTimeout(API_STREAM, { method: "POST", body: formData }, 60000);
       if (!res.ok) {
@@ -545,7 +547,7 @@ const AppContent = () => {
             </button>
           </div>
 
-          {activeTab === 'chat' && <ChatAgent messages={messages} onSendMessage={processChatMessage} isLoading={isBotLoading} />}
+          {activeTab === 'chat' && <ChatAgent messages={messages} onSendMessage={processChatMessage} isLoading={isBotLoading} agentMode={agentMode} setAgentMode={setAgentMode} />}
           {activeTab === 'prediction' && (
             <PredictionComponent
               sessionId={sessionIdRef.current}
@@ -811,7 +813,7 @@ const DiagnosisComponent = ({
 
 /* ================= CHAT AGENT ================= */
 
-const ChatAgent = ({ messages, onSendMessage, isLoading }) => {
+const ChatAgent = ({ messages, onSendMessage, isLoading, agentMode, setAgentMode }) => {
   const [input, setInput] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -971,6 +973,24 @@ const ChatAgent = ({ messages, onSendMessage, isLoading }) => {
 
   return (
     <div className="flex flex-col w-full h-full text-left relative z-10" id="chat-panel">
+      {/* Mode Toggle */}
+      <div className="flex justify-center shrink-0 mb-4 pt-2">
+        <div className="bg-white/70 backdrop-blur-sm border border-slate-200 p-1 rounded-full flex gap-1 shadow-sm">
+          <button
+            onClick={() => setAgentMode('medical_query')}
+            className={`px-5 py-2 rounded-full text-sm font-bold transition-all ${agentMode === 'medical_query' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-blue-600 hover:bg-white/50'}`}
+          >
+            Medical Query
+          </button>
+          <button
+            onClick={() => setAgentMode('doctor')}
+            className={`px-5 py-2 rounded-full text-sm font-bold transition-all ${agentMode === 'doctor' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-blue-600 hover:bg-white/50'}`}
+          >
+            Clinical Consultation
+          </button>
+        </div>
+      </div>
+
       <div
         ref={containerRef}
         className="flex-grow overflow-y-auto pr-4 pt-2 space-y-6 custom-scrollbar pb-10"

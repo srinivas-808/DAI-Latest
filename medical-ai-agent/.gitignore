@@ -6,6 +6,8 @@ __pycache__/
 
 overview.txt
 diagnos-ai-landing .html
+PROJECT_REPORT.md
+SYSTEM_DESIGN.md
 
 # Node
 frontend/node_modules/
