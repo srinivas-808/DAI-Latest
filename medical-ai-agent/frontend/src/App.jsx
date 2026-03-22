@@ -649,8 +649,8 @@ const PredictionComponent = ({
   };
 
   return (
-    <div className="flex flex-col md:flex-row gap-8 items-start min-h-[500px]" id="prediction-panel">
-      <div className="w-full md:w-1/2 md:sticky md:top-40">
+    <div className="flex flex-col md:flex-row gap-8 items-stretch flex-grow min-h-0 overflow-hidden" id="prediction-panel">
+      <div className="w-full md:w-1/2 shrink-0">
         <div
           onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
           onDragLeave={() => setIsDragging(false)}
@@ -675,12 +675,12 @@ const PredictionComponent = ({
           </button>
         </div>
       </div>
-      <div className="w-full md:w-1/2 flex flex-col space-y-6">
-        <button id="run-prediction-btn" onClick={handlePredict} disabled={!file || isLoading} className="w-full bg-blue-600 text-white font-bold py-5 rounded-2xl shadow-xl flex items-center justify-center text-lg hover:bg-blue-700 disabled:bg-slate-300 transition-all">
+      <div className="w-full md:w-1/2 flex flex-col min-h-0 space-y-6">
+        <button id="run-prediction-btn" onClick={handlePredict} disabled={!file || isLoading} className="w-full bg-blue-600 text-white font-bold py-5 rounded-2xl shadow-xl flex items-center justify-center text-lg hover:bg-blue-700 disabled:bg-slate-300 transition-all shrink-0">
           {isLoading ? <Loader2 className="animate-spin mr-3" /> : <BrainCircuit className="mr-3" />}
           {isLoading ? 'Analyzing...' : 'Run Vision Prediction'}
         </button>
-        <div className="overflow-y-auto max-h-[500px] pr-2 custom-scrollbar">
+        <div className="overflow-y-auto flex-grow min-h-0 pr-2 custom-scrollbar">
           {result ? (
             <div className="p-6 bg-slate-50 rounded-[2rem] border border-slate-200 animate-fade-in-up">
               <div className="flex justify-between items-center mb-4 sticky top-0 bg-slate-50/90 py-1 z-10 border-b border-slate-200/50">
@@ -774,36 +774,40 @@ const DiagnosisComponent = ({
   };
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto text-left" id="diagnosis-panel">
-      <div className="flex justify-between items-end px-2">
-        <h3 className="text-lg font-bold flex items-center"><Sparkles size={20} className="mr-2 text-blue-500" /> Symptoms</h3>
-        {symptoms && <button id="clear-symptoms-btn" onClick={() => { setSymptoms(''); setDiagnosis(''); }} className="text-xs text-rose-500 font-bold hover:underline flex items-center gap-1"><Trash2 size={14} /> Clear All</button>}
-      </div>
-      <div className="flex overflow-x-auto gap-3 pb-4 no-scrollbar scroll-smooth" id="symptom-chips">
-        {sorted.map(s => (
-          <button key={s} onClick={() => toggle(s)} className={`shrink-0 px-5 py-2.5 text-xs font-bold rounded-full border transition-all ${isSymptomActive(s) ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-slate-500 hover:border-blue-400'}`}>
-            {s}
-          </button>
-        ))}
-      </div>
-      <textarea id="symptoms-textarea" value={symptoms} onChange={e => setSymptoms(e.target.value)} rows="6" placeholder="Describe your symptoms in detail, or select from the tags above..." className="w-full p-6 border-2 border-slate-100 rounded-[2rem] outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-500 bg-slate-50 text-sm shadow-inner transition-all" />
-      <button id="generate-assessment-btn" onClick={handleDiagnose} disabled={isLoading || !symptoms.trim()} className="w-full bg-slate-800 text-white font-bold py-5 rounded-2xl shadow-xl hover:bg-slate-900 transition-all flex items-center justify-center text-lg disabled:bg-slate-300">
-        {isLoading ? <Loader2 className="animate-spin mr-3" /> : <Stethoscope className="mr-3" />}
-        {isLoading ? 'Synthesizing Assessment...' : 'Generate AI Assessment'}
-      </button>
-      {diagnosis && (
-        <div className="p-8 bg-white rounded-[2.5rem] border border-slate-200 shadow-xl animate-fade-in-up" id="diagnosis-result">
-          <div className="flex justify-between items-center mb-6 border-b pb-4">
-            <h3 className="font-bold text-lg flex items-center gap-2">
-              <Activity size={20} className="text-blue-500" />
-              AI Assessment
-            </h3>
-            <button id="discuss-diagnosis-btn" onClick={() => onImportToChat(diagnosis)} className="text-blue-600 font-bold text-xs flex items-center gap-2 px-4 py-2 rounded-full border border-blue-100 hover:bg-blue-600 hover:text-white transition-all">
-              <MessageSquarePlus size={16} /> Discuss in Chat
+    <div className="flex flex-col flex-grow min-h-0 overflow-hidden max-w-4xl mx-auto text-left w-full" id="diagnosis-panel">
+      <div className="shrink-0 space-y-6 pb-4">
+        <div className="flex justify-between items-end px-2">
+          <h3 className="text-lg font-bold flex items-center"><Sparkles size={20} className="mr-2 text-blue-500" /> Symptoms</h3>
+          {symptoms && <button id="clear-symptoms-btn" onClick={() => { setSymptoms(''); setDiagnosis(''); }} className="text-xs text-rose-500 font-bold hover:underline flex items-center gap-1"><Trash2 size={14} /> Clear All</button>}
+        </div>
+        <div className="flex overflow-x-auto gap-3 pb-4 no-scrollbar scroll-smooth" id="symptom-chips">
+          {sorted.map(s => (
+            <button key={s} onClick={() => toggle(s)} className={`shrink-0 px-5 py-2.5 text-xs font-bold rounded-full border transition-all ${isSymptomActive(s) ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-slate-500 hover:border-blue-400'}`}>
+              {s}
             </button>
-          </div>
-          <div className="text-sm text-slate-700 leading-relaxed markdown-body">
-            <ReactMarkdown>{diagnosis}</ReactMarkdown>
+          ))}
+        </div>
+        <textarea id="symptoms-textarea" value={symptoms} onChange={e => setSymptoms(e.target.value)} rows="4" placeholder="Describe your symptoms in detail, or select from the tags above..." className="w-full p-6 border-2 border-slate-100 rounded-[2rem] outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-500 bg-slate-50 text-sm shadow-inner transition-all" />
+        <button id="generate-assessment-btn" onClick={handleDiagnose} disabled={isLoading || !symptoms.trim()} className="w-full bg-slate-800 text-white font-bold py-5 rounded-2xl shadow-xl hover:bg-slate-900 transition-all flex items-center justify-center text-lg disabled:bg-slate-300">
+          {isLoading ? <Loader2 className="animate-spin mr-3" /> : <Stethoscope className="mr-3" />}
+          {isLoading ? 'Synthesizing Assessment...' : 'Generate AI Assessment'}
+        </button>
+      </div>
+      {diagnosis && (
+        <div className="flex-grow min-h-0 overflow-y-auto custom-scrollbar pr-2">
+          <div className="p-8 bg-white rounded-[2.5rem] border border-slate-200 shadow-xl animate-fade-in-up" id="diagnosis-result">
+            <div className="flex justify-between items-center mb-6 border-b pb-4 sticky top-0 bg-white/90 z-10">
+              <h3 className="font-bold text-lg flex items-center gap-2">
+                <Activity size={20} className="text-blue-500" />
+                AI Assessment
+              </h3>
+              <button id="discuss-diagnosis-btn" onClick={() => onImportToChat(diagnosis)} className="text-blue-600 font-bold text-xs flex items-center gap-2 px-4 py-2 rounded-full border border-blue-100 hover:bg-blue-600 hover:text-white transition-all">
+                <MessageSquarePlus size={16} /> Discuss in Chat
+              </button>
+            </div>
+            <div className="text-sm text-slate-700 leading-relaxed markdown-body">
+              <ReactMarkdown>{diagnosis}</ReactMarkdown>
+            </div>
           </div>
         </div>
       )}

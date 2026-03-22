@@ -5,12 +5,12 @@ import os
 
 # Load model ONCE
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MODEL_PATH = os.path.join(BASE_DIR, "models", "medical_classifier.keras")
+MODEL_PATH = os.path.join(BASE_DIR, "models", "medical_classifier_v2.keras")
 
 _classifier_model = None
 
 # IMPORTANT: must match training order
-CLASS_NAMES = ["ecgs", "mris", "xrays"]
+CLASS_NAMES = ["ecgs", "mris", "xrays", "none"]
 
 def _get_classifier():
     global _classifier_model
@@ -20,7 +20,7 @@ def _get_classifier():
 
 def classify_image(file_path: str):
     """
-    Classify medical image as ecg, mri, or xray using trained CNN.
+    Classify medical image as ecg, mri, xray, or none using trained CNN.
     """
 
     img = load_img(file_path, target_size=(224, 224))

@@ -147,18 +147,26 @@ def build_prompt(
     # Prediction results (only if a prediction was run)
     if prediction_result:
         sections.append("## AI Image Analysis Results")
-        sections.append(f"Image Type Detected: {prediction_result.get('input_type', 'Unknown')}")
-        sections.append(f"Model Used: {prediction_result.get('model_used', 'Unknown')}")
-        preds = prediction_result.get("predictions", [])
-        if preds:
-            sections.append("Findings:")
-            for pred in preds:
-                confidence_pct = int(pred["confidence"] * 100)
-                sections.append(f"- {pred['condition']}: {confidence_pct}% confidence")
+        img_type = prediction_result.get('input_type', 'Unknown')
+        
+        if img_type == "none":
+            sections.append("Image Type Detected: Not a medical image (ECG, MRI, or X-ray)")
+            sections.append("Findings: The uploaded image does not appear to be a medical image that the system can analyze (ECG, MRI, or X-ray).")
+            sections.append("")
+            sections.append("Note: Inform the user that it is not a medical image and ask for one.")
         else:
-            sections.append("No significant findings from the AI image analysis.")
-        sections.append("")
-        sections.append("Note: Present these as 'AI-assisted analysis findings' and recommend professional confirmation.")
+            sections.append(f"Image Type Detected: {img_type}")
+            sections.append(f"Model Used: {prediction_result.get('model_used', 'Unknown')}")
+            preds = prediction_result.get("predictions", [])
+            if preds:
+                sections.append("Findings:")
+                for pred in preds:
+                    confidence_pct = int(pred["confidence"] * 100)
+                    sections.append(f"- {pred['condition']}: {confidence_pct}% confidence")
+            else:
+                sections.append("No significant findings from the AI image analysis.")
+            sections.append("")
+            sections.append("Note: Present these as 'AI-assisted analysis findings' and recommend professional confirmation.")
         sections.append("")
     
     return "\n".join(sections)
