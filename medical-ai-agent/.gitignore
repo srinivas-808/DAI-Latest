@@ -1,8 +1,12 @@
 # Environment variables
 backend/venv/
+backend/tests/
 backend/venvw/
 __pycache__/
 *.pyc
+render.yaml
+run.sh
+verify_api.py
 
 overview.txt
 diagnos-ai-landing .html

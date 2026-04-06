@@ -149,7 +149,8 @@ async def chat_stream(
     message: str = Form(...),
     session_id: str = Form(...),
     file: Optional[UploadFile] = File(None),
-    agent_mode: str = Form("medical_query")
+    agent_mode: str = Form("medical_query"),
+    use_vision: str = Form("true")
 ):
     file_path = None
 
@@ -197,7 +198,7 @@ async def chat_stream(
                 user_message=message,
                 session_id=session_id,
                 file_path=file_path,
-                use_vision_capabilities=True,
+                use_vision_capabilities=(use_vision.lower() == "true"),
                 agent_mode=agent_mode
             )
 
@@ -206,11 +207,14 @@ async def chat_stream(
                 yield "data: [END]\n\n"
                 return
 
-            # Stream word-by-word for smooth UI effect
-            words = full_response.split(" ")
-            for word in words:
-                yield f"data: {word} \n\n"
-                time.sleep(0.03)
+            import urllib.parse
+            # Stream by chunks (not by space-separated words) to preserve formatting
+            chunk_size = 15
+            for i in range(0, len(full_response), chunk_size):
+                chunk = full_response[i:i+chunk_size]
+                encoded_chunk = urllib.parse.quote(chunk)
+                yield f"data: {encoded_chunk}\n\n"
+                time.sleep(0.02)
 
             yield "data: [END]\n\n"
 

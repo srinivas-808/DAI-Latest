@@ -399,29 +399,28 @@ const AppContent = () => {
       let botText = "";
       setMessages(prev => [...prev, { role: "bot", text: "" }]);
 
+      let buffer = "";
       while (true) {
         const { value, done } = await reader.read();
         if (done) break;
-        const chunk = decoder.decode(value);
-        if (chunk.includes("[END]")) {
-          // Parse any remaining data before [END]
-          const lines = chunk.split("\n\n");
-          for (const line of lines) {
-            if (line.startsWith("data: ")) {
-              const content = line.replace("data: ", "").trim();
-              if (content === "[END]") break;
-              if (content) botText += content + " ";
-            }
-          }
-          break;
-        }
+        buffer += decoder.decode(value, { stream: true });
 
-        const lines = chunk.split("\n\n");
-        for (const line of lines) {
-          if (line.startsWith("data: ")) {
-            const content = line.replace("data: ", "").trim();
-            if (content === "[END]") break;
-            if (content) botText += content + " ";
+        let parts = buffer.split("\n\n");
+        buffer = parts.pop();
+
+        let endStream = false;
+        for (const part of parts) {
+          if (part.startsWith("data: ")) {
+            const content = part.substring(6).trim();
+            if (content === "[END]") {
+              endStream = true;
+              break;
+            }
+            try {
+              botText += decodeURIComponent(content);
+            } catch (e) {
+              botText += content;
+            }
           }
         }
 
@@ -430,6 +429,8 @@ const AppContent = () => {
           updated[updated.length - 1] = { ...updated[updated.length - 1], text: botText };
           return updated;
         });
+
+        if (endStream) break;
       }
 
       // Final update with trimmed text
@@ -622,18 +623,51 @@ const PredictionComponent = ({
       fd.append("file", file);
       fd.append("message", "Please analyze this medical image and provide a detailed assessment.");
       fd.append("session_id", sessionId);
-      const res = await fetchWithTimeout(API_CHAT, { method: "POST", body: fd }, 60000);
+      fd.append("use_vision", "false"); // Use dedicated models pipeline, not raw vision
+      
+      const res = await fetchWithTimeout(API_STREAM, { method: "POST", body: fd }, 60000);
 
       if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.error || `Server error (${res.status})`);
+        const errorText = await res.text().catch(() => 'Unknown error');
+        throw new Error(`Server error (${res.status}): ${errorText}`);
       }
 
-      const data = await res.json();
-      if (data.error) {
-        throw new Error(data.error);
+      setResult("");
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let streamText = "";
+
+      let buffer = "";
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        let parts = buffer.split("\n\n");
+        buffer = parts.pop();
+
+        let endStream = false;
+        for (const part of parts) {
+          if (part.startsWith("data: ")) {
+            const content = part.substring(6).trim();
+            if (content === "[END]") {
+              endStream = true;
+              break;
+            }
+            try {
+              streamText += decodeURIComponent(content);
+            } catch (e) {
+              streamText += content;
+            }
+          }
+        }
+
+        setResult(streamText);
+
+        if (endStream) break;
       }
-      setResult(data.response || "No response received from the AI.");
+      
+      setResult(streamText.trim());
       toast('Image analysis complete!', 'success', 2000);
     } catch (error) {
       console.error("Prediction error:", error);
@@ -747,18 +781,49 @@ const DiagnosisComponent = ({
       const fd = new FormData();
       fd.append("message", `I am experiencing the following symptoms and would like a detailed assessment: ${symptoms}`);
       fd.append("session_id", sessionId);
-      const res = await fetchWithTimeout(API_CHAT, { method: "POST", body: fd }, 60000);
+      const res = await fetchWithTimeout(API_STREAM, { method: "POST", body: fd }, 60000);
 
       if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.error || `Server error (${res.status})`);
+        const errorText = await res.text().catch(() => 'Unknown error');
+        throw new Error(`Server error (${res.status}): ${errorText}`);
       }
 
-      const data = await res.json();
-      if (data.error) {
-        throw new Error(data.error);
+      setDiagnosis("");
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let streamText = "";
+
+      let buffer = "";
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        let parts = buffer.split("\n\n");
+        buffer = parts.pop();
+
+        let endStream = false;
+        for (const part of parts) {
+          if (part.startsWith("data: ")) {
+            const content = part.substring(6).trim();
+            if (content === "[END]") {
+              endStream = true;
+              break;
+            }
+            try {
+              streamText += decodeURIComponent(content);
+            } catch (e) {
+              streamText += content;
+            }
+          }
+        }
+
+        setDiagnosis(streamText);
+
+        if (endStream) break;
       }
-      setDiagnosis(data.response || "No response received from the AI.");
+
+      setDiagnosis(streamText.trim());
       toast('Assessment generated!', 'success', 2000);
     } catch (error) {
       console.error("Diagnosis error:", error);
