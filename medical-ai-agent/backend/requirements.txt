@@ -50,6 +50,9 @@ proto-plus==1.27.0
 protobuf==5.29.5
 pyasn1==0.6.1
 pyasn1_modules==0.4.2
+python-dotenv
+python-multipart
+sarvamai
 starlette==0.50.0
 tenacity==9.1.2
 tensorboard==2.20.0
@@ -66,4 +69,3 @@ websockets==15.0.1
 Werkzeug==3.1.4
 wheel==0.45.1
 wrapt==2.0.1
-sarvamai
